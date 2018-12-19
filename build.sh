@@ -1,1 +1,2 @@
-g++ *.cpp -o db
+mkdir build && cd build
+g++ ../*.cpp -o db
