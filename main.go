@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"shadowdb/handler/meta"
+	"shadowdb/handler/statement"
 )
 
 func printPrompt() {
@@ -25,6 +26,14 @@ func main() {
 			if err := meta.DoMetaCommand(command); err != nil {
 				log.Println(err)
 			}
+			continue
 		}
+		statement := new(statement.Statement)
+		statement.Prepare(command)
+		if err := statement.Execute(); err != nil {
+			log.Println(err)
+			continue
+		}
+		fmt.Println("Executed command")
 	}
 }
