@@ -34,7 +34,7 @@ func (statement *Statement) Prepare(command string) error {
 		statement.Type = StatementInsert
 		var tempUserName, tempEmail []byte
 		r := bytes.NewReader([]byte(command))
-		numberOfItems, err := fmt.Fscanf(r, "insert %d %s %s", &statement.Row.Id, &tempUserName, &tempEmail)
+		numberOfItems, err := fmt.Fscanf(r, "insert %d %s %s", &statement.Row.ID, &tempUserName, &tempEmail)
 		if numberOfItems != 3 || err != nil {
 			return errors.New("Syntax Error insert (number) (string) (string)")
 		}
@@ -63,20 +63,20 @@ func (statement *Statement) Execute(currentTable *table.Table) error {
 		}
 		log.Println("Added Row to table")
 	case StatementSelect:
-		for i := int8(0); i <= currentTable.CurrentPage; i++ {
-			var lastRow uint32
+		for i := uint(0); i <= currentTable.CurrentPage; i++ {
+			var lastRow uint
 			if i == currentTable.CurrentPage {
 				lastRow = currentTable.RowInPage
 			} else {
-				lastRow = uint32(table.RowsPerPage)
+				lastRow = uint(table.RowsPerPage)
 			}
-			for j := 0; uint32(j) < lastRow; j++ {
-				rowBytes := currentTable.ReadRow(i, uint32(j))
+			for j := uint(0); j < lastRow; j++ {
+				rowBytes := currentTable.ReadRow(i, uint(j))
 				rowString, err := helpers.BytesToRow(rowBytes)
 				if err != nil {
 					return err
 				}
-				fmt.Println(rowString.Id, string(rowString.Username[:]), string(rowString.Email[:]))
+				fmt.Println(rowString.ID, string(rowString.Username[:]), string(rowString.Email[:]))
 			}
 		}
 	}
