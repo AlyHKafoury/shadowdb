@@ -8,7 +8,7 @@ import (
 
 //Row table row
 type Row struct {
-	ID       uint
+	Id       int32
 	Username [32]byte
 	Email    [255]byte
 }
@@ -34,8 +34,8 @@ type Page [PageSize]byte
 //Table is a Memory Table
 type Table struct {
 	Pages       [TableMaxPages]Page
-	CurrentPage uint
-	RowInPage   uint
+	CurrentPage int8
+	RowInPage   uint32
 }
 
 //New return new table
@@ -45,10 +45,10 @@ func New() Table {
 
 //Insert insert row into the latest memory page
 func (table *Table) Insert(rowBytes []byte) error {
-	if table.RowInPage == uint(RowsPerPage) && table.CurrentPage == TableMaxPages-1 {
+	if table.RowInPage == uint32(RowsPerPage) && table.CurrentPage == TableMaxPages-1 {
 		return errors.New("Table is full")
 	}
-	pageOffset := table.RowInPage * uint(RowSize)
+	pageOffset := table.RowInPage * uint32(RowSize)
 	if table.RowInPage > 0 {
 		pageOffset += table.RowInPage - 1
 	}
@@ -60,7 +60,7 @@ func (table *Table) Insert(rowBytes []byte) error {
 	log.Println(pageOffset)
 	// log.Printf("%+v\n", table.Pages[table.CurrentPage])
 	table.RowInPage++
-	if table.RowInPage == uint(RowsPerPage) {
+	if table.RowInPage == uint32(RowsPerPage) {
 		if table.CurrentPage == TableMaxPages-1 {
 			return errors.New("Table is full")
 		}
@@ -70,13 +70,13 @@ func (table *Table) Insert(rowBytes []byte) error {
 	return nil
 }
 
-func (table *Table) ReadRow(page uint, row uint) []byte {
+func (table *Table) ReadRow(page int8, row uint32) []byte {
 	dataPage := table.Pages[table.CurrentPage]
-	rowStart := row * uint(RowSize)
+	rowStart := row * uint32(RowSize)
 	if rowStart > 0 {
 		rowStart += row - 1
 	}
-	rowBytes := dataPage[rowStart : rowStart+uint(RowSize)+1]
-	log.Println(rowStart, rowStart+uint(RowSize)+1)
+	rowBytes := dataPage[rowStart : rowStart+uint32(RowSize)+1]
+	log.Println(rowStart, rowStart+uint32(RowSize)+1)
 	return rowBytes
 }
