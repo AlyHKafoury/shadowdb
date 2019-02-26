@@ -34,7 +34,7 @@ func (statement *Statement) Prepare(command string) error {
 		statement.Type = StatementInsert
 		var tempUserName, tempEmail []byte
 		r := bytes.NewReader([]byte(command))
-		numberOfItems, err := fmt.Fscanf(r, "insert %d %s %s", &statement.Row.Id, &tempUserName, &tempEmail)
+		numberOfItems, err := fmt.Fscanf(r, "insert %d %s %s", &statement.Row.ID, &tempUserName, &tempEmail)
 		if numberOfItems != 3 || err != nil {
 			return errors.New("Syntax Error insert (number) (string) (string)")
 		}
@@ -76,7 +76,7 @@ func (statement *Statement) Execute(currentTable *table.Table) error {
 				if err != nil {
 					return err
 				}
-				fmt.Println(rowString.Id, string(rowString.Username[:]), string(rowString.Email[:]))
+				fmt.Println(rowString.ID, string(rowString.Username[:]), string(rowString.Email[:]))
 			}
 		}
 	}

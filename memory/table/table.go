@@ -8,7 +8,7 @@ import (
 
 //Row table row
 type Row struct {
-	Id       int32
+	ID       int32
 	Username [32]byte
 	Email    [255]byte
 }
