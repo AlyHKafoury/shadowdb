@@ -2,6 +2,7 @@ package table
 
 import (
 	"errors"
+	"log"
 	"unsafe"
 )
 
@@ -48,14 +49,15 @@ func (table *Table) Insert(rowBytes []byte) error {
 		return errors.New("Table is full")
 	}
 	pageOffset := table.RowInPage * uint32(RowSize)
-	if pageOffset > 0 {
-		pageOffset++
+	if table.RowInPage > 0 {
+		pageOffset += table.RowInPage - 1
 	}
 	freeMemorySliceInPage := table.Pages[table.CurrentPage][pageOffset:]
 	n := copy(freeMemorySliceInPage, rowBytes)
 	if n < RowSize-1 {
 		return errors.New("Writing to Table Memory Page failed")
 	}
+	log.Println(pageOffset)
 	// log.Printf("%+v\n", table.Pages[table.CurrentPage])
 	table.RowInPage++
 	if table.RowInPage == uint32(RowsPerPage) {
@@ -71,9 +73,10 @@ func (table *Table) Insert(rowBytes []byte) error {
 func (table *Table) ReadRow(page int8, row uint32) []byte {
 	dataPage := table.Pages[table.CurrentPage]
 	rowStart := row * uint32(RowSize)
-	if rowStart != 0 {
-		rowStart++
+	if rowStart > 0 {
+		rowStart += row - 1
 	}
 	rowBytes := dataPage[rowStart : rowStart+uint32(RowSize)+1]
+	log.Println(rowStart, rowStart+uint32(RowSize)+1)
 	return rowBytes
 }
