@@ -16,12 +16,13 @@ func printPrompt() {
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
-	currentTable := table.New()
+	databaseName := os.Args[1]
+	currentTable := table.New(databaseName)
 	for {
 		printPrompt()
 		scanner.Scan()
 		if err := scanner.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "reading standard input:", err)
+			log.Println(os.Stderr, "reading standard input:", err)
 		}
 		command := scanner.Text()
 		if string(command[0]) == "." {

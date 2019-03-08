@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"shadowdb/memory/helpers"
 	"shadowdb/memory/table"
 )
@@ -28,13 +27,21 @@ type Statement struct {
 }
 
 //Prepare make statement ready for execution
-func (statement *Statement) Prepare(command string) error {
-	switch string(command[0:6]) {
+func (statement *Statement) Prepare(input string) error {
+	if len(input) < 6 {
+		return errors.New("Wrong Command")
+	}
+	command := string(input[0:6])
+	switch command {
 	case "insert":
 		statement.Type = StatementInsert
 		var tempUserName, tempEmail []byte
-		r := bytes.NewReader([]byte(command))
+		r := bytes.NewReader([]byte(input))
 		numberOfItems, err := fmt.Fscanf(r, "insert %d %s %s", &statement.Row.ID, &tempUserName, &tempEmail)
+		if len(tempUserName) > len(statement.Row.Username) || len(tempEmail) > len(statement.Row.Email) {
+			fmt.Println("Input too long")
+			return errors.New("Input too long")
+		}
 		if numberOfItems != 3 || err != nil {
 			return errors.New("Syntax Error insert (number) (string) (string)")
 		}
@@ -61,7 +68,7 @@ func (statement *Statement) Execute(currentTable *table.Table) error {
 		if err = currentTable.Insert(rowbytes); err != nil {
 			return err
 		}
-		log.Println("Added Row to table")
+		fmt.Println("Added Row to table")
 	case StatementSelect:
 		for i := int8(0); i <= currentTable.CurrentPage; i++ {
 			var lastRow uint32
@@ -76,7 +83,7 @@ func (statement *Statement) Execute(currentTable *table.Table) error {
 				if err != nil {
 					return err
 				}
-				fmt.Println(rowString.ID, string(rowString.Username[:]), string(rowString.Email[:]))
+				fmt.Println(rowString.ID, string(bytes.Trim(rowString.Username[:], "\x00")), string(bytes.Trim(rowString.Email[:], "\x00")))
 			}
 		}
 	}
