@@ -1,7 +1,11 @@
 describe :database do
+  before do
+    `rm db;touch db;`
+  end
+
   def run_script(commands)
     raw_output = nil
-    IO.popen('./shadowdb', 'r+') do |pipe|
+    IO.popen('./shadowdb db', 'r+') do |pipe|
       commands.each do |command|
         pipe.puts command
       end
@@ -64,5 +68,26 @@ describe :database do
                                     'Shadow-DB *>> Executed command',
                                     'Shadow-DB *>> '
                                   ])
+  end
+
+  it 'keeps data after closing connection' do
+    result1 = run_script([
+                           'insert 1 user1 person1@example.com',
+                           '.exit'
+                         ])
+    expect(result1).to match_array([
+                                     'Executed command',
+                                     'Shadow-DB *>> ',
+                                     'Shadow-DB *>> Added Row to table'
+                                   ])
+    result2 = run_script([
+                           'select',
+                           '.exit'
+                         ])
+    expect(result2).to match_array([
+                                     'Executed command',
+                                     'Shadow-DB *>> ',
+                                     'Shadow-DB *>> 1 user1 person1@example.com'
+                                   ])
   end
 end
