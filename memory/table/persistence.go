@@ -13,6 +13,9 @@ func (table *Table) readOrCreate(databaseName string) error {
 		if table.file, err = os.Create(databaseName); err != nil {
 			return err
 		}
+		if fileInfo, err = os.Stat(databaseName); err != nil {
+			return err
+		}
 	} else {
 		if table.file, err = os.OpenFile(databaseName, os.O_RDWR|os.O_APPEND, 0755); err != nil {
 			return err
