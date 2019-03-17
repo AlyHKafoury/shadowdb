@@ -43,7 +43,7 @@ type Table struct {
 
 //New return new table
 func New(databaseName string) Table {
-	newTable := Table{CurrentPage: 0, RowInPage: 0}
+	newTable := Table{CurrentPage: 0, RowInPage: 0, readPages: make(map[int8]struct{})}
 	newTable.readOrCreate(databaseName)
 	return newTable
 }

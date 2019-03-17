@@ -26,7 +26,7 @@ func main() {
 		}
 		command := scanner.Text()
 		if string(command[0]) == "." {
-			if err := meta.DoMetaCommand(command); err != nil {
+			if err := meta.DoMetaCommand(command, &currentTable); err != nil {
 				log.Println(err)
 			}
 			continue
