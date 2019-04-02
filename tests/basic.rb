@@ -36,7 +36,7 @@ describe :database do
     expect(result[-2]).to eq('Shadow-DB *>> Table is full')
   end
 
-  it 'allows inserting strings that are the maximum length' do
+  it 'allows inserting the maximum length and retrieving it' do
     long_username = 'a' * 32
     long_email = 'a' * 255
     script = [
@@ -52,6 +52,13 @@ describe :database do
                                     'Executed command',
                                     'Shadow-DB *>> '
                                   ])
+    script2 = ['select', '.exit']
+    result2 = run_script(script2)
+    expect(result2).to match_array([
+                                     "Shadow-DB *>> 1 #{long_username} #{long_email}",
+                                     'Executed command',
+                                     'Shadow-DB *>> '
+                                   ])
   end
 
   it 'prints error message if strings are too long' do
